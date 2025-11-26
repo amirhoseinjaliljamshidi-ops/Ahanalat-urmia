@@ -1,0 +1,13 @@
+{
+    "manifest_version": 3,
+    "name": "My HTML App",
+    "version": "1.0",
+    "description": "My first chrome extension",
+    "action": {
+      "default_popup": "index.html"
+    },
+    "icons": {
+      "128": "ChatGPT Image Nov 26, 2025, 01_47_49 PM.png"
+    }
+  }
+  

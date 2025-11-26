@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="fa">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>حسابداری آهنالات اروم — آفلاین</title>
+  <style>
+    :root{direction:rtl;font-family:Tahoma,Arial,sans-serif}
+body{margin:0;padding:0;background:#db2020;color:#222}
+header{background:#ff9800;color:#fff;padding:18px 20px}
+.container{max-width:1200px;margin:18px auto;padding:16px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+button.tab{background:#fff;border:1px solid #ddd;padding:8px 12px;border-radius:8px;cursor:pointer}
+button.tab.active{background:#283593;color:#fff}
+.card{background:#ff6200;border-radius:8px;padding:14px;margin-top:14px;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+label{display:block;margin:8px 0 4px}
+input,select,textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #645151}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th,td{padding:8px;border-bottom:1px solid #443b3b;text-align:right}
+.actions{display:flex;gap:6px}
+.btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+.btn.primary{background:#1976d2;color:#fff}
+.btn.warn{background:#ff8a65;color:#fff}
+.btn.ghost{background:transparent;border:1px solid #ddd}
+.right{display:flex;justify-content:flex-end;gap:8px}
+.search-section{margin-top:10px}
+.print-area{display:none}
+.plate-box{display:flex;gap:6px;align-items:center}
+.plate-box {
+display: flex;
+align-items: center;
+gap: 6px;
+background: #ffffff;
+border: 2px solid #000;
+border-radius: 8px;
+padding: 6px 10px;
+width: fit-content;
+}
+.plate-part {
+width: 40px;
+text-align: center;
+font-size: 18px;
+font-weight: bold;
+border: 1px solid #555;
+border-radius: 4px;
+}
+.plate-part-long {
+width: 55px;
+}
+.plate-letter {
+font-size: 18px;
+font-weight: bold;
+border-radius: 4px;
+border: 1px solid #444;
+}
+.plate-region {
+font-size: 16px;
+font-weight: bold;
+border-radius: 4px;
+border: 1px solid #444;
+}
+.iran-box {
+background: #0040ff;
+color: #fff;
+padding: 2px 6px;
+font-size: 12px;
+font-weight: bold;
+border-radius: 4px;
+}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <h4 style="margin:0">آهنالات اروم</h4>
+        </div>
+        <div style="text-align:center">
+          <h4 style="margin:0">بسم الله الرحمن الرحیم</h4>
+        </div>
+        <div style="text-align:left">
+          <!-- header right (left visually) - leave blanks for user to fill -->
+          <div class="blue-box">
+            <h5 style="margin:4px 0">نام فروشنده: آقا جمشیدی</h5>
+            <h5 style="margin:4px 0">شماره تلفن فروشنده: 09141416250</h5>
+            <h5 style="margin:4px 0">شماره تلفن محل کار: __________</h5>
+            <h5 style="margin:4px 0">آدرس فروشنده: __________</h5>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:8px" class="small">ذخیره محلی (مرورگر) — بدون نیاز به سرور — واحد: ریال</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav>
+      <button class="tab active" data-tab="items">کالاها</button>
+      <button class="tab" data-tab="customers">مشتری‌ها</button>
+      <button class="tab" data-tab="drivers">راننده‌ها</button>
+      <button class="tab" data-tab="invoices">فاکتورها</button>
+      <button class="tab" data-tab="settings">تنظیمات / پشتیبان</button>
+    </nav>
+
+    <!-- ITEMS -->
+    <section id="items" class="card">
+      <h2>مدیریت کالاها</h2>
+      <div class="grid">
+        <div>
+          <label>نام کالا</label>
+          <input id="item-name" placeholder="مثال: میلگرد آجدار 16" />
+          <label>نوع</label>
+          <input id="item-type" placeholder="مثال: میلگرد / تیرآهن / ناودانی" />
+          <label>قیمت (ریال)</label>
+          <input id="item-price" type="number" min="0" />
+          <label>تعداد موجود</label>
+          <input id="item-qty" type="number" min="0" />
+          <label>بارکد (در صورت خالی خودکار ساخته می‌شود)</label>
+          <input id="item-barcode" placeholder="مثلا: IRN-0001" />
+          <div style="margin-top:10px" class="right">
+            <button class="btn primary" id="save-item">ذخیره کالا</button>
+            <button class="btn primary" id="print-barcode">پرینت بارکد</button>
+            <button class="btn ghost" id="clear-item">پاک کردن فرم</button>
+          </div>
+        <div style="margin-top:10px">
+          <div class="barcode-wrap">
+            بارکد تولید شده: <svg id="preview-barcode"></svg>
+        </div>
+        
+
+        <div>
+          <table id="items-table">
+            <thead><tr><th>نام</th><th>نوع</th><th>قیمت</th><th>تعداد</th><th>بارکد</th><th>عملیات</th></tr></thead>
+            <tbody></tbody>
+          </table>
+
+          <!-- search moved below table -->
+          <div style="margin-top:8px" class="search">
+            <input id="search-items" placeholder="جستجو بر اساس نام، نوع یا بارکد" />
+            <button class="btn" id="search-clear">پاک</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOMERS -->
+    <section id="customers" class="card" style="display:none">
+      <h2>مشتری‌ها</h2>
+      <div class="grid">
+        <div>
+          <label>نام مشتری</label>
+          <input id="cust-name" />
+          <label>تلفن</label>
+          <input id="cust-phone" />
+          <label>آدرس / توضیحات</label>
+          <textarea id="cust-note"></textarea>
+          <div class="right" style="margin-top:10px">
+            <button class="btn primary" id="save-cust">ذخیره مشتری</button>
+            <button class="btn ghost" id="clear-cust">پاک کردن فرم</button>
+          </div>
+        </div>
+
+        <div>
+          <table id="cust-table"><thead><tr><th>نام</th><th>تلفن</th><th>آدرس</th><th>عملیات</th></tr></thead><tbody></tbody></table>
+
+          <div style="margin-top:8px" class="search">
+            <input id="search-cust" placeholder="جستجو نام یا تلفن" />
+            <button class="btn" id="search-cust-clear">پاک</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DRIVERS -->
+    <section id="drivers" class="card" style="display:none">
+      <h2>راننده‌ها</h2>
+      <div class="grid">
+        <div>
+          <label>نام راننده</label>
+          <input id="driver-name" placeholder="مثال: علی رضایی" />
+          <label>ماشین راننده</label>
+          <input id="driver-vehicle" placeholder="مثلا: پژو 405" />
+          <label>پلاک راننده</label>
+          <div class="plate" style="margin-bottom:8px">
+            <input id="plate-part1" type="text" maxlength="2" placeholder="12" />
+            <select id="plate-letter"></select>
+            <input id="plate-part2" type="text" maxlength="3" placeholder="345" />
+            <div class="iran">ایران</div>
+            <select id="plate-region"></select>
+          </div>
+          <label>حقوق راننده (ریال)</label>
+          <input id="driver-salary" type="number" min="0" />
+          <label>شماره تلفن راننده</label>
+          <input id="driver-phone" placeholder="09xxxxxxxx" />
+          <div class="right" style="margin-top:10px">
+            <button class="btn primary" id="save-driver">ذخیره راننده</button>
+            <button class="btn ghost" id="clear-driver">پاک کردن فرم</button>
+          </div>
+        </div>
+
+        <div>
+          <table id="drivers-table"><thead><tr><th>نام</th><th>ماشین</th><th>پلاک</th><th>تلفن</th><th>عملیات</th></tr></thead><tbody></tbody></table>
+
+          <div style="margin-top:8px" class="search">
+            <input id="search-drivers" placeholder="جستجو نام، ماشین یا پلاک" />
+            <button class="btn" id="search-drivers-clear">پاک</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVOICES -->
+    <section id="invoices" class="card" style="display:none">
+      <h2>فاکتور جدید / ویرایش</h2>
+
+      <div class="grid">
+        <div>
+          <label>مشتری</label>
+          <select id="invoice-customer"><option value="">-- مشتری انتخاب کنید --</option></select>
+
+          <label>راننده</label>
+          <select id="invoice-driver"><option value="">-- راننده انتخاب کنید --</option></select>
+
+          <label>روش پرداخت</label>
+          <input id="invoice-pay-method" placeholder="مثلاً: کارت بانکی، نقدی، انتقال" />
+
+          <label>شماره کارت پرداخت (نمایش در فاکتور چاپ نشود)</label>
+          <input id="invoice-pay-card" placeholder="مثلاً: 6037-****-****-1234" />
+
+          <label>نام بانک</label>
+          <input id="invoice-pay-bank" placeholder="مثلاً: ملی، ملت، صادرات" />
+
+          <label>افزودن کالا به فاکتور</label>
+          <div style="display:flex;gap:8px">
+            <select id="invoice-item" style="flex:1"></select>
+            <input id="invoice-qty" type="number" min="1" placeholder="تعداد" style="width:100px" />
+            <button class="btn primary" id="add-to-invoice">افزودن</button>
+          </div>
+
+          <table id="invoice-lines"><thead><tr><th>کالا</th><th>تعداد</th><th>قیمت واحد</th><th>جمع</th><th></th></tr></thead><tbody></tbody></table>
+
+          <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+            <div>جمع کل: <span id="invoice-total">0</span> ریال</div>
+            <div class="actions">
+              <button class="btn primary" id="save-invoice">ذخیره فاکتور</button>
+              <button class="btn ghost" id="new-invoice">فاکتور جدید</button>
+              <button class="btn" id="print-invoice">پرینت</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <table id="invoices-table"><thead><tr><th>شماره</th><th>مشتری</th><th>تاریخ</th><th>جمع</th><th>عملیات</th></tr></thead><tbody></tbody></table>
+
+          <div style="margin-top:8px" class="search">
+            <input id="search-invoice" placeholder="جستجو شماره یا نام مشتری" />
+            <button class="btn" id="search-invoice-clear">پاک</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="card" style="display:none">
+      <h2>تنظیمات و پشتیبان‌گیری</h2>
+      <p class="small">دیتابیس محلی (IndexedDB) استفاده می‌شود. می‌توانید از داده‌ها خروجی JSON بگیرید یا مجدداً وارد کنید.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="export-json" class="btn">خروجی JSON</button>
+        <button id="import-json" class="btn">درون‌ریزی JSON</button>
+        <input type="file" id="import-file" style="display:none" accept="application/json" />
+        <button id="clear-all" class="btn warn">پاک کردن کامل دیتابیس</button>
+      </div>
+    </section>
+
+    <div id="print-area" class="print-area"></div>
+  </main>
+
+  <!-- JsBarcode -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+  <script>
+  (async function(){
+    // ---------- IndexedDB ----------
+    const DB_NAME = 'iron_shop_db_v2';
+    const DB_VERSION = 2;
+    let db;
+    function openDB(){
+      return new Promise((res,rej)=>{
+        const rq = indexedDB.open(DB_NAME, DB_VERSION);
+        rq.onupgradeneeded = e => {
+          const d = e.target.result;
+          if(!d.objectStoreNames.contains('items')){
+            const s = d.createObjectStore('items', {keyPath:'id'});
+            s.createIndex('name','name',{unique:false});
+            s.createIndex('barcode','barcode',{unique:true});
+          }
+          if(!d.objectStoreNames.contains('customers')){
+            d.createObjectStore('customers',{keyPath:'id'});
+          }
+          if(!d.objectStoreNames.contains('invoices')){
+            d.createObjectStore('invoices',{keyPath:'id'});
+          }
+          if(!d.objectStoreNames.contains('drivers')){
+            const s = d.createObjectStore('drivers',{keyPath:'id'});
+            s.createIndex('name','name',{unique:false});
+            s.createIndex('phone','phone',{unique:false});
+          }
+        };
+        rq.onsuccess = e => { db = e.target.result; res(db); };
+        rq.onerror = e => rej(e);
+      });
+    }
+    document.getElementById('print-barcode').addEventListener('click', ()=>{
+  const svg = document.getElementById('preview-barcode').outerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<!doctype html><html lang="fa"><head><meta charset="utf-8"><title>پرینت بارکد</title></head><body style="text-align:center;margin-top:50px;">${svg}</body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(()=> w.print(), 300);
+});
+
+    function tx(storeName, mode='readonly'){
+      if(!db) throw new Error('DB not open');
+      const t = db.transaction(storeName, mode);
+      return t.objectStore(storeName);
+    }
+    function put(storeName, obj){
+      return new Promise((res,rej)=>{ try{ const s = tx(storeName,'readwrite'); const r = s.put(obj); r.onsuccess = ()=>res(obj); r.onerror = e=>rej(e); } catch(err){ rej(err); } });
+    }
+    function getAll(storeName){
+      return new Promise((res,rej)=>{ try{ const s = tx(storeName); const r = s.getAll(); r.onsuccess = ()=>res(r.result||[]); r.onerror = e=>rej(e); } catch(err){ rej(err); } });
+    }
+    function getByKey(storeName,key){
+      return new Promise((res,rej)=>{ try{ const s = tx(storeName); const r = s.get(key); r.onsuccess = ()=>res(r.result); r.onerror = e=>rej(e); } catch(err){ rej(err); } });
+    }
+    function del(storeName,key){
+      return new Promise((res,rej)=>{ try{ const s = tx(storeName,'readwrite'); const r = s.delete(key); r.onsuccess = ()=>res(); r.onerror = e=>rej(e); } catch(err){ rej(err); } });
+    }
+
+    function uid(prefix='id'){ return prefix+'-'+Date.now().toString(36)+'-'+Math.floor(Math.random()*10000).toString(36); }
+    function formatNumber(n){ return (n||0).toLocaleString('fa-IR'); }
+
+    await openDB();
+
+    // ---------- UI helpers ----------
+    const el = s => document.querySelector(s);
+    const els = s => document.querySelectorAll(s);
+
+    // preview barcode
+    function previewBarcode(text){
+      const svg = el('#preview-barcode');
+      svg.innerHTML = '';
+      try{ JsBarcode(svg, text || 'NO-CODE', {format:'CODE128',displayValue:true,height:40,margin:4}); }catch(e){}
+    }
+
+    // ---------- Plate selectors ----------
+// حروف فارسی پلاک
+const persianLetters = ['الف','ب','پ','ت','ث','ج','چ','ح','خ','د','ذ','ر','ز','ژ','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ک','گ','ل','م','ن','و','ه','ی'];
+
+function initPlate(){
+  // letter
+  const letterSel = document.getElementById('plate-letter');
+  letterSel.innerHTML = '';
+  persianLetters.forEach(l=>{
+    const o = document.createElement('option');
+    o.value = l;
+    o.textContent = l;
+    letterSel.appendChild(o);
+  });
+
+  // region
+  const regionSel = document.getElementById('plate-region');
+  regionSel.innerHTML = '';
+  for(let i=10;i<=99;i++){
+    const o = document.createElement('option');
+    o.value = String(i);
+    o.textContent = String(i);
+    regionSel.appendChild(o);
+  }
+
+  // بخش اول و دوم فقط عدد
+  const part1 = document.getElementById('plate-part1');
+  const part2 = document.getElementById('plate-part2');
+
+  part1.addEventListener('input', e => {
+    e.target.value = e.target.value.replace(/\D/g,'').slice(0,2);
+  });
+  part2.addEventListener('input', e => {
+    e.target.value = e.target.value.replace(/\D/g,'').slice(0,3);
+  });
+}
+
+// تبدیل پلاک به متن برای نمایش یا چاپ
+function makePlateText(plateObj){
+  if(!plateObj) return '';
+  return `${plateObj.part1} ${plateObj.letter} ${plateObj.part2} ایران ${plateObj.region}`;
+}
+
+
+    // ---------- Items ----------
+    let editingItemId = null;
+    async function refreshItems(filter=''){
+      const rows = el('#items-table tbody'); rows.innerHTML = '';
+      const items = await getAll('items');
+      const f = (filter||'').trim().toLowerCase();
+      items.filter(it=>{
+        if(!f) return true;
+        return (it.name||'').toLowerCase().includes(f) || (it.type||'').toLowerCase().includes(f) || (it.barcode||'').toLowerCase().includes(f);
+      }).forEach(it=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${it.name}</td><td>${it.type||''}</td><td>${formatNumber(it.price)}</td><td>${formatNumber(it.qty)}</td><td>${it.barcode||''}</td>
+          <td class="actions">
+            <button class="btn" data-id="${it.id}" data-action="edit">ویرایش</button>
+            <button class="btn" data-id="${it.id}" data-action="del">حذف</button>
+            <button class="btn" data-id="${it.id}" data-action="barcode">بارکد</button>
+          </td>`;
+        rows.appendChild(tr);
+      });
+
+      // update invoice item selector
+      const sel = el('#invoice-item'); sel.innerHTML = '<option value="">-- انتخاب کالا --</option>';
+      items.forEach(it=>{ const opt = document.createElement('option'); opt.value = it.id; opt.textContent = `${it.name} — ${formatNumber(it.price)} ریال — (${it.qty})`; sel.appendChild(opt); })
+    }
+
+    el('#item-barcode').addEventListener('input', ()=> previewBarcode(el('#item-barcode').value) );
+
+    el('#save-item').addEventListener('click', async ()=>{
+      try{
+        const name = el('#item-name').value.trim(); if(!name){ alert('نام کالا را وارد کنید'); return; }
+        const type = el('#item-type').value.trim();
+        const price = Number(el('#item-price').value)||0;
+        const qty = Number(el('#item-qty').value)||0;
+        let barcode = el('#item-barcode').value.trim();
+        if(!barcode) barcode = 'IR-'+Math.random().toString(36).slice(2,9).toUpperCase();
+        const id = editingItemId || uid('item');
+        const item = {id,name,type,price,qty,barcode};
+        await put('items', item);
+        editingItemId = null; clearItemForm(); await refreshItems(el('#search-items').value);
+        previewBarcode('');
+        alert('کالا ذخیره شد');
+      }catch(err){ console.error(err); alert('خطا در ذخیره کالا'); }
+    });
+
+    function clearItemForm(){ editingItemId = null; el('#item-name').value=''; el('#item-type').value=''; el('#item-price').value=''; el('#item-qty').value=''; el('#item-barcode').value=''; }
+
+    el('#clear-item').addEventListener('click', clearItemForm);
+
+    el('#items-table').addEventListener('click', async (e)=>{
+      const btn = e.target.closest('button'); if(!btn) return;
+      const id = btn.dataset.id; const action = btn.dataset.action;
+      if(action==='edit'){ const it = await getByKey('items', id); if(it){ editingItemId = it.id; el('#item-name').value = it.name; el('#item-type').value = it.type; el('#item-price').value = it.price; el('#item-qty').value = it.qty; el('#item-barcode').value = it.barcode; previewBarcode(it.barcode); } }
+      if(action==='del'){ if(confirm('آیا مطمئن هستید؟')){ await del('items', id); await refreshItems(el('#search-items').value); } }
+      if(action==='barcode'){ const it = await getByKey('items', id); if(it){ previewBarcode(it.barcode); alert('بارکد در پیش‌نمایش نشان داده شد.'); } }
+    });
+
+    el('#search-clear').addEventListener('click', ()=>{ el('#search-items').value=''; refreshItems(); });
+    el('#search-items').addEventListener('input', ()=> refreshItems(el('#search-items').value));
+
+    // ---------- Customers ----------
+    let editingCustId = null;
+    async function refreshCustomers(filter=''){
+      const rows = el('#cust-table tbody'); rows.innerHTML = '';
+      const arr = await getAll('customers');
+      const f = (filter||'').trim().toLowerCase();
+      arr.filter(c=>{
+        if(!f) return true;
+        return (c.name||'').toLowerCase().includes(f) || (c.phone||'').toLowerCase().includes(f) || (c.note||'').toLowerCase().includes(f);
+      }).forEach(c=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${c.name}</td><td>${c.phone||''}</td><td>${c.note||''}</td>
+          <td class="actions"><button class="btn" data-id="${c.id}" data-action="edit">ویرایش</button>
+          <button class="btn" data-id="${c.id}" data-action="del">حذف</button></td>`;
+        rows.appendChild(tr);
+      });
+
+      // update invoice customer selector
+      const sel = el('#invoice-customer'); sel.innerHTML = '<option value="">-- مشتری انتخاب کنید --</option>';
+      arr.forEach(c=>{ const opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.name + (c.phone?(' — '+c.phone):''); sel.appendChild(opt); })
+    }
+
+    el('#save-cust').addEventListener('click', async ()=>{
+      const name = el('#cust-name').value.trim(); if(!name){ alert('نام مشتری را وارد کنید'); return; }
+      const phone = el('#cust-phone').value.trim();
+      const note = el('#cust-note').value.trim();
+      const id = editingCustId || uid('cust');
+      const obj = {id,name,phone,note};
+      await put('customers', obj); editingCustId = null; clearCustForm(); await refreshCustomers(el('#search-cust').value); alert('مشتری ذخیره شد');
+    });
+    function clearCustForm(){ editingCustId = null; el('#cust-name').value=''; el('#cust-phone').value=''; el('#cust-note').value=''; }
+    el('#clear-cust').addEventListener('click', clearCustForm);
+
+    el('#cust-table').addEventListener('click', async e=>{
+      const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
+      if(action==='edit'){ const c = await getByKey('customers', id); if(c){ editingCustId = c.id; el('#cust-name').value = c.name; el('#cust-phone').value = c.phone || ''; el('#cust-note').value = c.note || ''; } }
+      if(action==='del'){ if(confirm('آیا حذف شود؟')){ await del('customers', id); await refreshCustomers(); } }
+    });
+
+    el('#search-cust-clear').addEventListener('click', ()=>{ el('#search-cust').value=''; refreshCustomers(); });
+    el('#search-cust').addEventListener('input', ()=> refreshCustomers(el('#search-cust').value));
+
+    // ---------- Drivers ----------
+    let editingDriverId = null;
+    async function refreshDrivers(filter=''){
+      const rows = el('#drivers-table tbody'); rows.innerHTML = '';
+      const arr = await getAll('drivers');
+      const f = (filter||'').trim().toLowerCase();
+      arr.filter(d=>{
+        if(!f) return true;
+        const plateStr = `${d.plate?.part1||''} ${d.plate?.letter||''} ${d.plate?.part2||''} ایران ${d.plate?.region||''}`.toLowerCase();
+        return (d.name||'').toLowerCase().includes(f) || (d.vehicle||'').toLowerCase().includes(f) || plateStr.includes(f) || (d.phone||'').toLowerCase().includes(f);
+      }).forEach(d=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${d.name}</td><td>${d.vehicle||''}</td><td>${d.plate?(`${d.plate.part1} ${d.plate.letter} ${d.plate.part2} ایران ${d.plate.region}`):''}</td><td>${d.phone||''}</td>
+          <td class="actions"><button class="btn" data-id="${d.id}" data-action="edit">ویرایش</button><button class="btn" data-id="${d.id}" data-action="del">حذف</button></td>`;
+        rows.appendChild(tr);
+      });
+
+      // update invoice driver selector
+      const sel = el('#invoice-driver'); sel.innerHTML = '<option value="">-- راننده انتخاب کنید --</option>';
+      arr.forEach(d=>{ const opt = document.createElement('option'); opt.value = d.id; opt.textContent = d.name + (d.vehicle?(' — '+d.vehicle):''); sel.appendChild(opt); })
+    }
+
+    el('#save-driver').addEventListener('click', async ()=>{
+      const name = el('#driver-name').value.trim(); if(!name){ alert('نام راننده را وارد کنید'); return; }
+      const vehicle = el('#driver-vehicle').value.trim();
+      const plate = {
+        part1: el('#plate-part1').value.trim(),
+        letter: el('#plate-letter').value,
+        part2: el('#plate-part2').value.trim(),
+        region: el('#plate-region').value
+      };
+      if(!/^\d{2}$/.test(plate.part1)){ alert('بخش اول پلاک باید دو رقم باشد (مثلاً 12)'); return; }
+      if(!/^\d{3}$/.test(plate.part2)){ alert('بخش سه‌رقمی پلاک باید سه رقم باشد (مثلاً 345)'); return; }
+      if(!/^\d{2}$/.test(plate.region) || Number(plate.region)<10 || Number(plate.region)>99){ alert('انتخاب منطقه (10-99) الزامی است'); return; }
+
+      const salary = Number(el('#driver-salary').value) || 0;
+      const phone = el('#driver-phone').value.trim();
+      const id = editingDriverId || uid('driver');
+      const obj = {id,name,vehicle,plate,salary,phone};
+      await put('drivers', obj);
+      editingDriverId = null; clearDriverForm(); await refreshDrivers(el('#search-drivers').value); alert('راننده ذخیره شد');
+    });
+
+    function clearDriverForm(){
+      editingDriverId = null;
+      el('#driver-name').value=''; el('#driver-vehicle').value=''; el('#plate-part1').value=''; el('#plate-part2').value=''; el('#plate-letter').selectedIndex = 0; el('#plate-region').selectedIndex = 0;
+      el('#driver-salary').value=''; el('#driver-phone').value='';
+    }
+    el('#clear-driver').addEventListener('click', clearDriverForm);
+
+    el('#drivers-table').addEventListener('click', async e=>{
+      const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
+      if(action==='edit'){ const d = await getByKey('drivers', id); if(d){ editingDriverId = d.id; el('#driver-name').value = d.name; el('#driver-vehicle').value = d.vehicle || ''; el('#plate-part1').value = d.plate.part1 || ''; el('#plate-part2').value = d.plate.part2 || ''; el('#plate-letter').value = d.plate.letter || persianLetters[0]; el('#plate-region').value = d.plate.region || '10'; el('#driver-salary').value = d.salary||''; el('#driver-phone').value = d.phone||''; } }
+      if(action==='del'){ if(confirm('آیا حذف شود؟')){ await del('drivers', id); await refreshDrivers(); } }
+    });
+
+    el('#search-drivers-clear').addEventListener('click', ()=>{ el('#search-drivers').value=''; refreshDrivers(); });
+    el('#search-drivers').addEventListener('input', ()=> refreshDrivers(el('#search-drivers').value));
+
+    // ---------- Invoices ----------
+    let currentInvoice = { id:null, customerId:null, driverId:null, date:null, lines:[] };
+
+    function recalcInvoice(){
+      const total = currentInvoice.lines.reduce((s,l)=> s + (l.qty*l.price), 0);
+      el('#invoice-total').textContent = formatNumber(total);
+    }
+
+    function renderInvoiceLines(){
+      const tbody = el('#invoice-lines tbody'); tbody.innerHTML = '';
+      currentInvoice.lines.forEach((l,idx)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${l.name}</td><td>${l.qty}</td><td>${formatNumber(l.price)}</td><td>${formatNumber(l.qty*l.price)}</td><td><button class="btn" data-idx="${idx}" data-action="del">حذف</button></td>`;
+        tbody.appendChild(tr);
+      });
+      recalcInvoice();
+    }
+
+    el('#add-to-invoice').addEventListener('click', async ()=>{
+      const itemId = el('#invoice-item').value; if(!itemId){ alert('کالا را انتخاب کنید'); return; }
+      const qty = Number(el('#invoice-qty').value) || 1;
+      const it = await getByKey('items', itemId);
+      if(!it){ alert('کالا یافت نشد'); return; }
+      currentInvoice.lines.push({itemId:it.id,name:it.name,qty,price:it.price});
+      renderInvoiceLines(); el('#invoice-qty').value='';
+    });
+
+    el('#invoice-lines').addEventListener('click', e=>{
+      const btn = e.target.closest('button'); if(!btn) return; const idx = Number(btn.dataset.idx);
+      if(btn.dataset.action==='del'){ currentInvoice.lines.splice(idx,1); renderInvoiceLines(); }
+    });
+
+    el('#save-invoice').addEventListener('click', async ()=>{
+      if(!currentInvoice.lines.length){ alert('ابتدا کالا به فاکتور اضافه کنید'); return; }
+      const custId = el('#invoice-customer').value || null;
+      const driverId = el('#invoice-driver').value || null;
+      currentInvoice.customerId = custId;
+      currentInvoice.driverId = driverId;
+      currentInvoice.date = new Date().toISOString();
+      currentInvoice.id = currentInvoice.id || uid('inv');
+      await put('invoices', currentInvoice);
+      // update stock
+      for(const line of currentInvoice.lines){ const it = await getByKey('items', line.itemId); if(it){ it.qty = Number(it.qty) - Number(line.qty); if(it.qty<0) it.qty = 0; await put('items', it); } }
+      await refreshItems(); await refreshInvoices(); alert('فاکتور ذخیره شد');
+      currentInvoice = {id:null,customerId:null,driverId:null,date:null,lines:[]}; renderInvoiceLines();
+    });
+
+    el('#new-invoice').addEventListener('click', ()=>{ if(confirm('فاکتور جدید ساخته شود؟')){ currentInvoice = {id:null,customerId:null,driverId:null,date:null,lines:[]}; renderInvoiceLines(); el('#invoice-customer').value=''; el('#invoice-driver').value=''; } });
+
+    async function refreshInvoices(filter=''){
+      const rows = el('#invoices-table tbody'); rows.innerHTML = '';
+      const arr = await getAll('invoices');
+      const custs = await getAll('customers');
+      const f = (filter||'').trim().toLowerCase();
+      arr.filter(inv=>{
+        if(!f) return true;
+        const c = custs.find(x=>x.id===inv.customerId);
+        return (inv.id||'').toLowerCase().includes(f) || (c && (c.name||'').toLowerCase().includes(f));
+      }).forEach(inv=>{
+        const c = custs.find(x=>x.id===inv.customerId);
+        const total = (inv.lines||[]).reduce((s,l)=>s+(l.qty*l.price),0);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${inv.id}</td><td>${c?c.name:'-'}</td><td>${inv.date?new Date(inv.date).toLocaleString('fa-IR'):'-'}</td><td>${formatNumber(total)}</td>
+          <td class="actions">
+            <button class="btn" data-id="${inv.id}" data-action="view">مشاهده/چاپ</button>
+            <button class="btn" data-id="${inv.id}" data-action="load">بارگذاری</button>
+            <button class="btn" data-id="${inv.id}" data-action="del">حذف</button>
+          </td>`;
+        rows.appendChild(tr);
+      });
+    }
+
+    el('#invoices-table').addEventListener('click', async e=>{
+      const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
+      if(action==='view'){ const inv = await getByKey('invoices', id); if(inv) printInvoice(inv); }
+      if(action==='load'){ const inv = await getByKey('invoices', id); if(inv){ currentInvoice = inv; renderInvoiceLines(); el('#invoice-customer').value = inv.customerId || ''; el('#invoice-driver').value = inv.driverId || ''; } }
+      if(action==='del'){ if(confirm('آیا فاکتور حذف شود؟')){ await del('invoices', id); await refreshInvoices(); } }
+    });
+
+    el('#search-invoice-clear').addEventListener('click', ()=>{ el('#search-invoice').value=''; refreshInvoices(); });
+    el('#search-invoice').addEventListener('input', ()=> refreshInvoices(el('#search-invoice').value));
+
+    // ---------- Print invoice ----------
+    async function printInvoice(inv){
+  const cust = inv.customerId ? await getByKey('customers', inv.customerId) : null;
+  const driver = inv.driverId ? await getByKey('drivers', inv.driverId) : null;
+  const total = (inv.lines||[]).reduce((s,l)=>s+(l.qty*l.price),0);
+  const linesHtml = (inv.lines||[]).map(l=>`<tr><td>${l.name}</td><td>${l.qty}</td><td>${formatNumber(l.price)}</td><td>${formatNumber(l.qty*l.price)}</td></tr>`).join('');
+
+  // پلاک راننده
+  const driverPlate = driver ? makePlateText(driver.plate) : '';
+
+  const driverRows = driver ? `<tr><td>راننده</td><td colspan="3">${driver.name} — تلفن: ${driver.phone||''} — پلاک: ${driverPlate}</td></tr>` : '';
+
+  const customerAddress = cust ? (cust.note || '') : '';
+
+  const dateLabel = inv.date ? new Date(inv.date) : new Date();
+  const dateStr = dateLabel.toLocaleDateString('fa-IR') + ' ' + dateLabel.toLocaleTimeString('fa-IR');
+
+
+      const html = `<!doctype html>
+      <html lang="fa"><head><meta charset="utf-8"><title>فاکتور ${inv.id}</title>
+      <style>
+        body{font-family:Tahoma;direction:rtl;padding:16px}
+        h4{margin:0 0 6px 0;text-align:center}
+        .header{display:flex;justify-content:space-between;align-items:center}
+        table{width:100%;border-collapse:collapse;margin-top:8px}
+        th,td{border:1px solid #ddd;padding:6px;text-align:right}
+        .signs{display:flex;justify-content:space-between;margin-top:24px}
+        .small{font-size:13px}
+      </style>
+      </head><body>
+      <div class="header">
+        <div><h4 style="text-align:left">آهنالات اروم</h4></div>
+        <div><h4>بسم الله الرحمن الرحیم</h4></div>
+        <div style="text-align:left">
+          <div class="small">نام فروشنده: آقا جمشیدی </div>
+          <div class="small">تلفن فروشنده: 09141416250</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div>شماره فاکتور: <strong>${inv.id}</strong></div>
+        <div>تاریخ و ساعت: <strong>${dateStr}</strong></div>
+        <div>مشتری: <strong>${cust ? cust.name : '---'}</strong></div>
+        <div>آدرس مشتری: <strong>${customerAddress}</strong></div>
+      </div>
+
+      <table>
+        <thead><tr><th>کالا</th><th>تعداد</th><th>قیمت واحد (ریال)</th><th>جمع</th></tr></thead>
+        <tbody>
+          ${linesHtml}
+          <tr><td colspan="3" style="padding:6px">جمع کل</td><td style="padding:6px">${formatNumber(total)} ریال</td></tr>
+          ${driverRows}
+        </tbody>
+      </table>
+
+      <div class="signs">
+        <div>امضای فروشنده: ____________________</div>
+        <div>امضای مشتری: _____________________</div>
+      </div>
+      </body></html>`;
+
+      const w = window.open('', '_blank');
+      if(!w){ alert('مرورگر پنجرهٔ چاپ را مسدود کرده است — تنظیمات مرورگر را بررسی کن'); return; }
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+      setTimeout(()=> w.print(), 400);
+    }
+
+    el('#print-invoice').addEventListener('click', async ()=>{
+      if(!currentInvoice || !currentInvoice.id){ alert('ابتدا فاکتور را ذخیره کنید یا از لیست فاکتورها یکی را باز کنید'); return; }
+      const inv = await getByKey('invoices', currentInvoice.id);
+      if(inv) printInvoice(inv); else alert('فاکتور یافت نشد');
+    });
+
+    // allow view/print directly from saved list
+    // already handled in invoices-table click (view action)
+
+    // ---------- Settings: export/import/clear ----------
+    el('#export-json').addEventListener('click', async ()=>{
+      const items = await getAll('items'); const customers = await getAll('customers'); const invoices = await getAll('invoices'); const drivers = await getAll('drivers');
+      const blob = new Blob([JSON.stringify({items,customers,invoices,drivers},null,2)],{type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'ironshop-backup-'+(new Date().toISOString().slice(0,10))+'.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    el('#import-json').addEventListener('click', ()=> el('#import-file').click());
+    el('#import-file').addEventListener('change', async (e)=>{
+      const f = e.target.files[0]; if(!f) return; const txt = await f.text(); try{
+        const data = JSON.parse(txt);
+        if(data.items) for(const it of data.items) await put('items', it);
+        if(data.customers) for(const c of data.customers) await put('customers', c);
+        if(data.invoices) for(const i of data.invoices) await put('invoices', i);
+        if(data.drivers) for(const d of data.drivers) await put('drivers', d);
+        alert('درون‌ریزی انجام شد'); await refreshAll();
+      }catch(err){ alert('خطا در فرمت فایل'); }
+    });
+
+    el('#clear-all').addEventListener('click', async ()=>{
+      if(!confirm('همه داده‌ها پاک شوند؟ این عملیات غیرقابل بازگشت است.')) return;
+      db.close(); const req = indexedDB.deleteDatabase(DB_NAME);
+      req.onsuccess = ()=>{ alert('دیتابیس پاک شد — صفحه را دوباره بارگذاری می‌شود'); location.reload(); }
+      req.onerror = ()=>{ alert('خطا در پاک کردن دیتابیس'); }
+    });
+
+    // ---------- Tabs ----------
+    els('button.tab').forEach(b=>b.addEventListener('click', ()=>{
+      els('button.tab').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+      const t = b.dataset.tab;
+      ['items','customers','drivers','invoices','settings'].forEach(k=> el('#'+k).style.display = (k===t? 'block':'none'));
+    }));
+
+    // ---------- Refresh All ----------
+    async function refreshAll(){
+      await refreshItems();
+      await refreshCustomers();
+      await refreshDrivers();
+      await refreshInvoices();
+    }
+
+    // ---------- Misc init ----------
+    initPlate();
+    await refreshAll();
+    previewBarcode('');
+  })();
+  </script>
+</body>
+</html>
